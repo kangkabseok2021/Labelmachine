@@ -38,6 +38,11 @@ bool LabelingMachine::resume() {
     state = previousState;
     previousState = cstate;
     sensors = previousSensors;
+    if (isLowerLabels()) {
+        std::cout << "[WARNING] Low label warning - Labels remaining: "
+                  << sensors.labelRollRemaining << "\n";
+        state = MachineState::LOW_LABEL;
+    } 
     std::cout << "[INFO] Machine resumed - Speed: " << sensors.conveyorSpeed << " mm/s\n";
     return true;
 }
@@ -49,7 +54,7 @@ bool LabelingMachine::resume() {
  * Can be called from RUNNING state.
  */
 bool LabelingMachine::pause() {
-    if (state != MachineState::RUNNING) {
+    if (state != MachineState::RUNNING && state != MachineState::LOW_LABEL) {
         std::cout << "[WARNING] Cannot pause machine - not in RUNNING state\n";
         return false;
     }

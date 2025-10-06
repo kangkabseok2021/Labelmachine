@@ -145,7 +145,7 @@ int main() {
     std::cout << ">>> Simulating production cycle (5 products) after maintenance...\n\n";
     for (int i = 0; i < 50; i++) {
         // Simulate conveyor timing
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(500));
         if(i ==10) machine.loadLabelRoll(55); 
 
         // Product enters labeling zone
