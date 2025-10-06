@@ -58,7 +58,7 @@ bool LabelingMachine::pause() {
     state = MachineState::PAUSED;
     previousSensors = sensors;
     sensors.conveyorSpeed = 0;
-    std::cout << "[INFO] Machine pauseded - Total labeled: "
+    std::cout << "[INFO] Machine paused - Total labeled: "
                 << productsLabeled << " - Remaining labels: " 
                 << sensors.labelRollRemaining << "\n";
     return true;
@@ -102,6 +102,6 @@ bool LabelingMachine::exitMaintenance() {
     previousState = state;
     state = MachineState::IDLE;
     sensors.conveyorSpeed = 0;
-    std::cout << "[INFO] Machine  - Speed: " << Config::DEFAULT_SPEED << " mm/s\n";
+    std::cout << "[INFO] Machine exited from maintenance mode. Ready for operation.\n";
     return true;
 }

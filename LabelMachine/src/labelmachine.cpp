@@ -164,9 +164,9 @@ void LabelingMachine::detectProduct(bool detected) {
 void LabelingMachine::printStatus() const {
     std::cout << "\n";
     std::cout << "╔══════════════════════════════════════════════╗\n";
-    std::cout << "║     ESPERA LM-3000 Machine Status           ║\n";
+    std::cout << "║     ESPERA LM-3000 Machine Status            ║\n";
     std::cout << "╠══════════════════════════════════════════════╣\n";
-    std::cout << "║ Machine ID: " << std::left << std::setw(30) << machineId << "║\n";
+    std::cout << "║ Machine ID: " << std::left << std::setw(30) << machineId << "   ║\n";
     std::cout << "║ State:      " << std::left << std::setw(30);
 
     switch(state) {
@@ -176,14 +176,14 @@ void LabelingMachine::printStatus() const {
         case MachineState::ERROR:       std::cout << "ERROR"; break;
         case MachineState::MAINTENANCE: std::cout << "MAINTENANCE"; break;
     }
-    std::cout << "║\n";
+    std::cout << "   ║\n";
     std::cout << "╠══════════════════════════════════════════════╣\n";
-    std::cout << "║ Conveyor Speed:    " << std::setw(15) << sensors.conveyorSpeed << " mm/s  ║\n";
-    std::cout << "║ Labels Remaining:  " << std::setw(15) << sensors.labelRollRemaining << "        ║\n";
-    std::cout << "║ Products Labeled:  " << std::setw(15) << productsLabeled << "        ║\n";
+    std::cout << "║ Conveyor Speed:    " << std::setw(15) << sensors.conveyorSpeed << " mm/s      ║\n";
+    std::cout << "║ Labels Remaining:  " << std::setw(15) << sensors.labelRollRemaining << "           ║\n";
+    std::cout << "║ Products Labeled:  " << std::setw(15) << productsLabeled << "           ║\n";
     std::cout << "║ Temperature:       " << std::setw(15) << std::fixed << std::setprecision(1)
-              << sensors.temperature << " °C    ║\n";
-    std::cout << "║ Error Count:       " << std::setw(15) << errorCount << "        ║\n";
+              << sensors.temperature << " °C        ║\n";
+    std::cout << "║ Error Count:       " << std::setw(15) << errorCount << "           ║\n";
     std::cout << "╚══════════════════════════════════════════════╝\n";
     std::cout << "\n";
 }
