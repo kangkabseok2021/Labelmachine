@@ -146,7 +146,8 @@ int main() {
     for (int i = 0; i < 50; i++) {
         // Simulate conveyor timing
         // std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        if(i ==10) machine.loadLabelRoll(55); 
+        if(i == 10) machine.loadLabelRoll(55); 
+        if(i == 40) machine.loadLabelRoll(155); 
 
         // Product enters labeling zone
         machine.detectProduct(true);
