@@ -33,18 +33,35 @@
 #include <thread>
 #include <iomanip>
 #include <vector>
+#include <map>
+#include <algorithm>
 
-// Configuration Constants
-namespace Config {
-    constexpr int DEFAULT_SPEED = 150;          // mm/s - Normal operating speed
-    constexpr int MAX_SPEED = 300;              // mm/s - Maximum safe speed
-    constexpr int MIN_SPEED = 50;               // mm/s - Minimum operating speed
-    constexpr int MAINTENANCE_SPEED = 20;       // mm/s - Speed for maintenance mode
-    constexpr int INITIAL_LABEL_COUNT = 1000;   // Initial labels in roll
-    constexpr int LOW_LABEL_THRESHOLD = 50;      // Low label warning threshold
-    constexpr double NOMINAL_TEMP = 22.5;       // °C - Normal operating temperature
-    constexpr double MAX_TEMP = 65.0;           // °C - Maximum safe temperature
-}
+// Configuration parameters and limits
+// Define the configuration structure with default values
+struct MachineConfig {
+    int defaultSpeed = 150;            // mm/s - Normal operating speed
+    int maxSpeed = 300;                // mm/s - Maximum safe speed
+    int minSpeed = 50;                 // mm/s - Minimum operating speed
+    int maintenanceSpeed = 20;         // mm/s - Speed for maintenance mode
+    int initialLabelCount = 1000;      // Initial labels in roll
+    int lowLabelThreshold = 50;        // Low label warning threshold
+    double nominalTemperature = 22.5;  // °C - Normal operating temperature
+    double maxTemperature = 65.0;      // °C - Maximum safe temperature 
+    
+    // Helper function to display current configuration
+    void print() const {
+        std::cout << "\n--- Current Machine Configuration ---\n";
+        std::cout << "  Default Speed: " << defaultSpeed << " mm/s\n        ";
+        std::cout << "  Max Speed: " << maxSpeed << " mm/s\n        ";
+        std::cout << "  Min Speed: " << minSpeed << " mm/s      \n        ";
+        std::cout << "  Maintenance Speed: " << maintenanceSpeed << " mm/s\n        ";
+        std::cout << "  Initial Label Count: " << initialLabelCount << "\n        ";
+        std::cout << "  Low Label Threshold: " << lowLabelThreshold << "\n        ";
+        std::cout << "  Nominal Temperature: " << nominalTemperature << " °C\n        ";
+        std::cout << "  Max Temperature: " << maxTemperature << " °C\n";
+        std::cout << "----------------------------------------\n";
+    }
+};
 
 /**
  * @enum MachineState
@@ -109,6 +126,9 @@ private:
     SensorData sensors;                 ///< Current sensor readings
     SensorData previousSensors;         ///< Previous sensor readings
 
+    // Machine Configuration
+    MachineConfig config;               ///< Configurable machine parameters
+
     // Production Metrics
     int productsLabeled;                ///< Total products labeled in current session
     int errorCount;                     ///< Total errors encountered
@@ -126,7 +146,7 @@ private:
      * @return true if speed is safe, false otherwise
      */
     bool isSpeedValid(int speed) const {
-        return speed >= Config::MIN_SPEED && speed <= Config::MAX_SPEED;
+        return speed >= config.minSpeed && speed <= config.maxSpeed;
     }
 
     /**
@@ -134,7 +154,7 @@ private:
      * @return true if temperature is safe, false otherwise
      */
     bool isTemperatureSafe() const {
-        return sensors.temperature < Config::MAX_TEMP;
+        return sensors.temperature < config.maxTemperature;
     }
 
     /**
@@ -142,7 +162,7 @@ private:
      * @return true if temperature is safe, false otherwise
      */
     bool isLowerLabels() const {
-        return sensors.labelRollRemaining < Config::LOW_LABEL_THRESHOLD;
+        return sensors.labelRollRemaining < config.lowLabelThreshold;
     }
 
 public:
@@ -301,6 +321,8 @@ public:
     void openLog();
     void closeLog();
     void logEntry(const std::string& status);
+    void loadConfig(const std::string& filename);
+
 };
 
 
