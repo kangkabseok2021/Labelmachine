@@ -25,10 +25,14 @@
 #define LABELINGMACHINE_H
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <chrono>
+#include <ctime> 
 #include <thread>
 #include <iomanip>
+#include <vector>
 
 // Configuration Constants
 namespace Config {
@@ -72,6 +76,9 @@ struct SensorData {
     double temperature;         ///< System temperature in Celsius
 };
 
+// Define the name of the log file
+const std::string LOG_FILE_NAME = "production_log.txt";
+
 /**
  * @class LabelingMachine
  * @brief Main controller class for the ESPERA LM-3000 labeling machine
@@ -109,6 +116,9 @@ private:
     // System Information
     std::string machineId;              ///< Unique machine identifier
     std::string firmwareVersion;        ///< Current firmware version
+
+    // File stream object for logging
+    std::ofstream logFile;              ///< Log file stream
 
     /**
      * @brief Validates if requested speed is within safe operating limits
@@ -286,6 +296,11 @@ public:
      * - Machine must be in MAINTENANCE state
      */
     bool exitMaintenance();
+
+    std::string getCurrentTime();
+    void openLog();
+    void closeLog();
+    void logEntry(const std::string& status);
 };
 
 

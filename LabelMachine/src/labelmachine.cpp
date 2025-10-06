@@ -30,7 +30,9 @@ LabelingMachine::LabelingMachine()
 {
     std::cout << "[SYSTEM] Machine initialized: " << machineId
               << " (Firmware: " << firmwareVersion << ")\n";
+    openLog();
 }
+ 
 
 /**
 * @brief Destructor - ensures machine is safely stopped
@@ -39,6 +41,7 @@ LabelingMachine::~LabelingMachine() {
     if (state == MachineState::RUNNING) {
         stop();
     }
+    closeLog();
     std::cout << "[SYSTEM] Machine shutdown complete\n";
 }
 
@@ -132,6 +135,8 @@ void LabelingMachine::applyLabel() {
                       << sensors.labelRollRemaining << "\n";
             state = MachineState::LOW_LABEL;
         } 
+        // Log production event
+        logEntry("SUCCESS");
         // Simulate temperature increase from operation
         sensors.temperature += 0.1;
 
@@ -142,6 +147,7 @@ void LabelingMachine::applyLabel() {
     } else {
         state = MachineState::ERROR;
         errorCount++;
+        logEntry("FAILURE");
         sensors.conveyorSpeed = 0;
         std::cout << "[ERROR] Label application failed - Roll empty!\n";
     }

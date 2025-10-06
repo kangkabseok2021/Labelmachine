@@ -110,3 +110,56 @@ bool LabelingMachine::exitMaintenance() {
     std::cout << "[INFO] Machine exited from maintenance mode. Ready for operation.\n";
     return true;
 }
+
+std::string LabelingMachine::getCurrentTime() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm* parts = std::localtime(&now_c);
+    if(!parts) {
+        return "0000-00-00 00:00:00"; // Fallback in case of error
+    }
+
+    std::stringstream ss;
+    ss << std::put_time(parts, "%Y-%m-%d %H:%M:%S");
+    return ss.str();
+}
+
+void LabelingMachine::openLog() {
+    // Open log file
+    logFile.open(LOG_FILE_NAME, std::ios::out | std::ios::trunc);
+
+    if (!logFile) {
+        std::cerr << "[ERROR] Failed to open log file: " << LOG_FILE_NAME << "\n";
+    }
+
+    // Write the CSV header row
+    logFile << "Timestamp,ProductID,Temperature,Speed,Status\n";
+    logFile.flush();
+    std::cout << "[INFO] Log file initialized and header written on: " << LOG_FILE_NAME << "\n";
+}
+
+void LabelingMachine::logEntry(const std::string& status) {
+    if (!logFile.is_open()) {
+        std::cerr << "[ERROR] Log file not open. Cannot log entry.\n";
+        return;
+    }
+    int productId = productsLabeled; // Using productsLabeled as ProductID
+    if(status == "FAILURE") {
+        productId = productsLabeled + 1; // Next product ID for failure
+    }
+    std::string timestamp = getCurrentTime();
+    logFile << timestamp << ","
+            << productId << ","
+            << std::fixed << std::setprecision(1) << sensors.temperature << ","
+            << sensors.conveyorSpeed << ","
+            << status << "\n";
+    logFile.flush();
+}
+
+void LabelingMachine::closeLog() {
+    if (logFile.is_open()) {
+        std::cout << "\n[INFO] Closing product log (" << LOG_FILE_NAME << ")\n";
+        std::cout << " Total products logged: " << productsLabeled << "\n";
+        logFile.close();
+    }
+}
