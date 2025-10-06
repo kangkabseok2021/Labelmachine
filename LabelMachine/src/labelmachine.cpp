@@ -76,6 +76,11 @@ bool LabelingMachine::start() {
 
     state = MachineState::RUNNING;
     previousState = MachineState::RUNNING;
+    if (isLowerLabels()) {
+        std::cout << "[WARNING] Low label warning - Labels remaining: "
+                  << sensors.labelRollRemaining << "\n";
+        state = MachineState::LOW_LABEL;
+    }    
     sensors.conveyorSpeed = Config::DEFAULT_SPEED;
     std::cout << "[INFO] Machine started - Speed: " << Config::DEFAULT_SPEED << " mm/s\n";
     return true;
@@ -112,7 +117,7 @@ void LabelingMachine::stop() {
  *       and wait for label application confirmation
  */
 void LabelingMachine::applyLabel() {
-    if (state != MachineState::RUNNING) {
+    if (state != MachineState::RUNNING && state != MachineState::LOW_LABEL) {
         return;
     }
     if (!sensors.productDetected) {
@@ -122,7 +127,11 @@ void LabelingMachine::applyLabel() {
     if (sensors.labelRollRemaining > 0) {
         sensors.labelRollRemaining--;
         productsLabeled++;
-
+        if (isLowerLabels()) {
+            std::cout << "[WARNING] Low label warning - Labels remaining: "
+                      << sensors.labelRollRemaining << "\n";
+            state = MachineState::LOW_LABEL;
+        } 
         // Simulate temperature increase from operation
         sensors.temperature += 0.1;
 
@@ -149,7 +158,7 @@ void LabelingMachine::applyLabel() {
  */
 void LabelingMachine::detectProduct(bool detected) {
     sensors.productDetected = detected;
-    if (detected && state == MachineState::RUNNING) {
+    if (detected && (state == MachineState::RUNNING || state == MachineState::LOW_LABEL)) {
         std::cout << "[SENSOR] Product detected at labeling position\n";
         applyLabel();
     }
@@ -172,6 +181,10 @@ void LabelingMachine::printStatus() const {
     switch(state) {
         case MachineState::IDLE:        std::cout << "IDLE"; break;
         case MachineState::RUNNING:     std::cout << "RUNNING"; break;
+        case MachineState::LOW_LABEL:   std::cout << "LOW_LABEL"; 
+            std::cout << "   ║\n";
+            std::cout << "║ [WARNING] Low label warning               ";
+            break;
         case MachineState::PAUSED:      std::cout << "PAUSED"; break;
         case MachineState::ERROR:       std::cout << "ERROR"; break;
         case MachineState::MAINTENANCE: std::cout << "MAINTENANCE"; break;
@@ -198,7 +211,7 @@ void LabelingMachine::printStatus() const {
  * Requested speed must be within MIN_SPEED and MAX_SPEED limits.
  */
 bool LabelingMachine::setSpeed(int speed) {
-    if (state != MachineState::RUNNING) {
+    if (state != MachineState::RUNNING && state != MachineState::LOW_LABEL) {
         std::cout << "[WARNING] Cannot adjust speed - machine not running\n";
         return false;
     }
@@ -259,6 +272,11 @@ void LabelingMachine::loadLabelRoll(int labelCount) {
 
     sensors.labelRollRemaining = labelCount;
     std::cout << "[INFO] Label roll loaded: " << labelCount << " labels\n";
+    // Clear error state if it was due to empty labels
+    if (state == MachineState::LOW_LABEL && labelCount >= Config::LOW_LABEL_THRESHOLD) {
+        state = MachineState::RUNNING;
+        std::cout << "[INFO] Low Label Warning cleared - machine is running\n";
+    }
 
     // Clear error state if it was due to empty labels
     if (state == MachineState::ERROR && labelCount > 0) {

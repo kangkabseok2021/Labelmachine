@@ -37,6 +37,7 @@ namespace Config {
     constexpr int MIN_SPEED = 50;               // mm/s - Minimum operating speed
     constexpr int MAINTENANCE_SPEED = 20;       // mm/s - Speed for maintenance mode
     constexpr int INITIAL_LABEL_COUNT = 1000;   // Initial labels in roll
+    constexpr int LOW_LABEL_THRESHOLD = 50;      // Low label warning threshold
     constexpr double NOMINAL_TEMP = 22.5;       // °C - Normal operating temperature
     constexpr double MAX_TEMP = 65.0;           // °C - Maximum safe temperature
 }
@@ -51,6 +52,7 @@ namespace Config {
 enum class MachineState {
     IDLE,           ///< Machine is powered on but not operating
     RUNNING,        ///< Machine is actively labeling products
+    LOW_LABEL,      ///< Machine is actively labeling products with low label warning
     PAUSED,         ///< Machine is temporarily halted (can resume)
     ERROR,          ///< Machine has encountered an error condition
     MAINTENANCE     ///< Machine is in maintenance/calibration mode
@@ -123,6 +125,14 @@ private:
      */
     bool isTemperatureSafe() const {
         return sensors.temperature < Config::MAX_TEMP;
+    }
+
+    /**
+     * @brief Checks if machine temperature is within safe operating range
+     * @return true if temperature is safe, false otherwise
+     */
+    bool isLowerLabels() const {
+        return sensors.labelRollRemaining < Config::LOW_LABEL_THRESHOLD;
     }
 
 public:

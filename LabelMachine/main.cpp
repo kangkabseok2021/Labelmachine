@@ -121,6 +121,7 @@ int main() {
     machine.enterMaintenance();
     // Simulate conveyor timing
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
     // Check status mid-maintenance
     std::cout << "\n>>> Mid-Maintenance status check:\n";
     machine.printStatus();
@@ -131,17 +132,27 @@ int main() {
     // Exit maintenance
     machine.exitMaintenance();
 
-    // Simulate production cycle again- label 5 products
+    // Check status after-maintenance
+    std::cout << "\n>>> After-Maintenance status check:\n";
+    machine.printStatus();
+
+    // Simulate production cycle again- label 50 products
+    std::cout << ">>> Starting production run...\n\n";
+    if (!machine.start()) {
+        std::cerr << "Failed to start machine\n";
+        return 1;
+    }
     std::cout << ">>> Simulating production cycle (5 products) after maintenance...\n\n";
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 50; i++) {
         // Simulate conveyor timing
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        if(i ==10) machine.loadLabelRoll(55); 
 
         // Product enters labeling zone
         machine.detectProduct(true);
 
         // Small delay for product to exit
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(100));
         machine.detectProduct(false);
     }
     // Check status mid-production
