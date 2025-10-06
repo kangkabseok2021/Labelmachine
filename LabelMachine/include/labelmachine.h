@@ -98,6 +98,7 @@ private:
 
     // Sensor Interface
     SensorData sensors;                 ///< Current sensor readings
+    SensorData previousSensors;         ///< Previous sensor readings
 
     // Production Metrics
     int productsLabeled;                ///< Total products labeled in current session
@@ -232,7 +233,49 @@ public:
      * @brief Simulates loading a new label roll
      * @param labelCount Number of labels in the new roll
      */
-    void loadLabelRoll(int labelCount); 
+    void loadLabelRoll(int labelCount);
+    /**
+     * @brief Resumes the labeling machine operation
+     *
+     * Transitions machine from PAUSED to RUNNING state and sets conveyor
+     * to previous speed. Validates preconditions before resuming.
+     *
+     * @return true if machine resumed successfully, false otherwise
+     *
+     * Preconditions:
+     * - Machine must be in PAUSED state
+     * - Temperature must be within safe range
+     * - Label supply must be available
+     * - If Label is not available, transitions machine to IDLE state
+     */
+    bool resume();
+    /**
+     * @brief Pauses the labeling machine operation
+     *
+     * Transitions machine to PAUSE state and halts conveyor belt.
+     * Can be called from RUNNING state.
+     */
+    bool pause();
+
+    /**
+     * @brief Enter maintenance the labeling machine
+     *
+     * Transitions machine to MAINTENANCE state and the conveyor speed is fixed.
+     * Can be called from IDLE state.
+     */
+    bool enterMaintenance();
+    /**
+     * @brief Exit maintenance mode of the labeling machine
+     *
+     * Transitions machine from MAINTENANCE to IDLE state and sets conveyor
+     * speed to 0. 
+     *
+     * @return true if machine exit maintenance mode successfully, false otherwise
+     *
+     * Preconditions:
+     * - Machine must be in MAINTENANCE state
+     */
+    bool exitMaintenance();
 };
 
 

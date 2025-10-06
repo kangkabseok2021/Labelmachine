@@ -73,7 +73,29 @@ int main() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         machine.detectProduct(false);
     }
+    // Simulate production cycle - label 6 products with paused 4 periods
+    std::cout << ">>> Simulating production cycle (6 products) with paused 4 periods...\n\n";
+    for (int i = 0; i < 10; i++) {
+        // Simulate conveyor timing
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        if(i == 3) machine.pause();
+        if(i == 7) {
+            machine.resume();
+            std::cout << "\n>>> Mid-production status check on resume:\n";
+            machine.printStatus();
+        }
+        if(i == 5) {
+            // Check status PAUSED
+            std::cout << "\n>>> Mid-production status (PAUSED) check:\n";
+            machine.printStatus();
+        }
+        // Product enters labeling zone
+        machine.detectProduct(true);
 
+        // Small delay for product to exit
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        machine.detectProduct(false);
+    }
     // Check status mid-production
     std::cout << "\n>>> Mid-production status check:\n";
     machine.printStatus();
