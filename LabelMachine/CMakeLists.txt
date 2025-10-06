@@ -9,7 +9,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 project ("LabelMachine")
 
 # Add source to this project's executable.
-add_executable (labelMachine "main.cpp" "src/labelmachine.cpp" )
+add_executable (labelMachine "main.cpp" "src/labelmachine.cpp" "src/labelm_task.cpp")
 target_include_directories(labelMachine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
