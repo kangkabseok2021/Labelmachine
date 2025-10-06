@@ -42,6 +42,7 @@
  * @return 0 on successful completion
  */
 int main() {
+    const std::string filename = "machine_config.txt";  // Configuration file name
     std::cout << "╔══════════════════════════════════════════════╗\n";
     std::cout << "║   ESPERA LM-3000 Control System v2.1.0       ║\n";
     std::cout << "║   Industrial Labeling Machine Controller     ║\n";
@@ -49,6 +50,7 @@ int main() {
 
     // Initialize machine
     LabelingMachine machine;
+    machine.loadConfig(filename);
 
     // Display initial status
     machine.printStatus();

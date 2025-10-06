@@ -83,7 +83,7 @@ bool LabelingMachine::enterMaintenance() {
 
     previousState = MachineState::IDLE;
     state = MachineState::MAINTENANCE;
-    sensors.conveyorSpeed = Config::MAINTENANCE_SPEED;
+    sensors.conveyorSpeed = config.maintenanceSpeed;
     std::cout << "[INFO] Machine in maintenance." << "\n";
     return true;
 }

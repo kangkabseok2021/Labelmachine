@@ -12,6 +12,8 @@ void LabelingMachine::loadConfig(const std::string& filename) {
     if(!infile.is_open()) {
         std::cout << "[WARNING] Configuration file not found or cannot be opened: " << filename << "\n";    
         std::cout << "[INFO] Using default settings.\n";
+        sensors.labelRollRemaining = config.initialLabelCount; // Initialize sensor value
+        sensors.temperature = config.nominalTemperature; // Initialize sensor value
         return;
     }
 
@@ -22,7 +24,7 @@ void LabelingMachine::loadConfig(const std::string& filename) {
 
         size_t pos = line.find('=');
         if (pos == std::string::npos) continue;
-        std:;string key = line.substr(0, pos);
+        std::string key = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
         temp_settings[key] = value;
     }
@@ -31,16 +33,11 @@ void LabelingMachine::loadConfig(const std::string& filename) {
         std::cout << "[INFO] Loaded config: " << pair.first << " = " << pair.second << "\n";
         if(pair.first == "defaultSpeed") {
             int val = std::stoi(pair.second);
-            if(val >= Config::MIN_SPEED && val <= Config::MAX_SPEED) {
-                config.defaultSpeed = val;
-            } else {
-                std::cout << "[WARNING] Invalid defaultSpeed value in config. Using default: " 
-                          << config.defaultSpeed << "\n";
-            }
+            config.defaultSpeed = val;
         } 
         else if(pair.first == "maxSpeed") {
             int val = std::stoi(pair.second);
-            if(val >= Config::MIN_SPEED && val <= 500) { // Arbitrary upper limit
+            if(val >= 0 && val <= 500) { // Arbitrary upper limit
                 config.maxSpeed = val;
             } else {
                 std::cout << "[WARNING] Invalid maxSpeed value in config. Using default: " 
@@ -49,7 +46,7 @@ void LabelingMachine::loadConfig(const std::string& filename) {
         } 
         else if(pair.first == "minSpeed") {
             int val = std::stoi(pair.second);
-            if(val >= 10 && val <= Config::MAX_SPEED) { // Arbitrary lower limit
+            if(val >= 10 && val <= 200) { // Arbitrary lower limit
                 config.minSpeed = val;
             } else {
                 std::cout << "[WARNING] Invalid minSpeed value in config. Using default: " 
@@ -58,7 +55,7 @@ void LabelingMachine::loadConfig(const std::string& filename) {
         } 
         else if(pair.first == "maintenanceSpeed") {
             int val = std::stoi(pair.second);
-            if(val >= 5 && val <= Config::MAX_SPEED) { // Arbitrary limits
+            if(val >= 5 && val <= 1000) { // Arbitrary limits
                 config.maintenanceSpeed = val;
             } else {
                 std::cout << "[WARNING] Invalid maintenanceSpeed value in config. Using default: " 
@@ -104,4 +101,7 @@ void LabelingMachine::loadConfig(const std::string& filename) {
         }           
     }
     infile.close(); 
+    sensors.labelRollRemaining = config.initialLabelCount; // Initialize sensor value
+    sensors.temperature = config.nominalTemperature; // Initialize sensor value
+    std::cout << "[INFO] Configuration loading complete.\n";
 }   

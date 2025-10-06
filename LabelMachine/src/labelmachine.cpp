@@ -22,7 +22,7 @@
 LabelingMachine::LabelingMachine()
     : state(MachineState::IDLE)
     , previousState(MachineState::IDLE)
-    , sensors({false, 0, Config::INITIAL_LABEL_COUNT, Config::NOMINAL_TEMP})
+    , sensors({false, 0, 0, 22.0})
     , productsLabeled(0)
     , errorCount(0)
     , machineId("LM3000-001")
@@ -83,9 +83,9 @@ bool LabelingMachine::start() {
         std::cout << "[WARNING] Low label warning - Labels remaining: "
                   << sensors.labelRollRemaining << "\n";
         state = MachineState::LOW_LABEL;
-    }    
-    sensors.conveyorSpeed = Config::DEFAULT_SPEED;
-    std::cout << "[INFO] Machine started - Speed: " << Config::DEFAULT_SPEED << " mm/s\n";
+    }
+    sensors.conveyorSpeed = config.defaultSpeed;
+    std::cout << "[INFO] Machine started - Speed: " << config.defaultSpeed << " mm/s\n";
     return true;
 }
 
@@ -224,8 +224,8 @@ bool LabelingMachine::setSpeed(int speed) {
 
     if (!isSpeedValid(speed)) {
         std::cout << "[ERROR] Invalid speed: " << speed
-                  << " mm/s (valid range: " << Config::MIN_SPEED
-                  << "-" << Config::MAX_SPEED << ")\n";
+                  << " mm/s (valid range: " << config.minSpeed
+                  << "-" << config.maxSpeed << ")\n";
         return false;
     }
 
@@ -279,7 +279,7 @@ void LabelingMachine::loadLabelRoll(int labelCount) {
     sensors.labelRollRemaining = labelCount;
     std::cout << "[INFO] Label roll loaded: " << labelCount << " labels\n";
     // Clear error state if it was due to empty labels
-    if (state == MachineState::LOW_LABEL && labelCount >= Config::LOW_LABEL_THRESHOLD) {
+    if (state == MachineState::LOW_LABEL && labelCount >= config.lowLabelThreshold) {
         state = MachineState::RUNNING;
         std::cout << "[INFO] Low Label Warning cleared - machine is running\n";
     }
