@@ -85,12 +85,12 @@ clean: CMakeFiles/labelMachine.dir/clean
 CMakeFiles/labelMachine.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles --progress-num=1,2 "Built target labelMachine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles --progress-num=1,2,3 "Built target labelMachine"
 .PHONY : CMakeFiles/labelMachine.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/labelMachine.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/labelMachine.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles 0
 .PHONY : CMakeFiles/labelMachine.dir/rule
@@ -102,7 +102,7 @@ labelMachine: CMakeFiles/labelMachine.dir/rule
 # codegen rule for target.
 CMakeFiles/labelMachine.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles --progress-num=1,2 "Finished codegen for target labelMachine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles --progress-num=1,2,3 "Finished codegen for target labelMachine"
 .PHONY : CMakeFiles/labelMachine.dir/codegen
 
 # clean rule for target.

@@ -160,6 +160,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/labelmachine.o: src/labelmachine.cpp.o
+.PHONY : src/labelmachine.o
+
+# target to build an object file
+src/labelmachine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/src/labelmachine.cpp.o
+.PHONY : src/labelmachine.cpp.o
+
+src/labelmachine.i: src/labelmachine.cpp.i
+.PHONY : src/labelmachine.i
+
+# target to preprocess a source file
+src/labelmachine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/src/labelmachine.cpp.i
+.PHONY : src/labelmachine.cpp.i
+
+src/labelmachine.s: src/labelmachine.cpp.s
+.PHONY : src/labelmachine.s
+
+# target to generate assembly for a file
+src/labelmachine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/labelMachine.dir/build.make CMakeFiles/labelMachine.dir/src/labelmachine.cpp.s
+.PHONY : src/labelmachine.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -173,6 +197,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/labelmachine.o"
+	@echo "... src/labelmachine.i"
+	@echo "... src/labelmachine.s"
 .PHONY : help
 
 
