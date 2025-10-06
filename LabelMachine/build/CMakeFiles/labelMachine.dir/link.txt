@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/labelMachine.dir/link.d CMakeFiles/labelMachine.dir/main.cpp.o -o labelMachine

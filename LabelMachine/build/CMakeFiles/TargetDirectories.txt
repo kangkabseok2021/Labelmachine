@@ -1,0 +1,3 @@
+/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles/labelMachine.dir
+/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles/edit_cache.dir
+/home/kabs/CodeP/Labelmachine/LabelMachine/build/CMakeFiles/rebuild_cache.dir
