@@ -25,85 +25,9 @@ void LapTimeSimulator::addTrackSegment(double length, double radius, double incl
     track.push_back(seg);
 }
 
-// Calculate aerodynamic drag force
-double LapTimeSimulator::calculateDrag(double velocity) {
-    return 0.5 * AIR_DENSITY * vehicle.frontalArea * vehicle.dragCoeff * velocity * velocity;
-}
-
 // Calculate downforce
 double LapTimeSimulator::calculateDownforce(double velocity) {
     return 0.5 * AIR_DENSITY * vehicle.frontalArea * vehicle.downforceCoeff * velocity * velocity;
-}
-
-// Calculate maximum cornering speed
-double LapTimeSimulator::calculateMaxCornerSpeed(double radius) {
-    if (radius == 0) return 1000.0;  // Straight (no limit from cornering)
-    
-    // Simplified: v_max = sqrt(μ * g * r)
-    // In reality, includes downforce effects
-    double downforceAtSpeed = 1000.0;  // Simplified assumption
-    double normalForce = vehicle.mass * GRAVITY + downforceAtSpeed;
-    double maxSpeed = sqrt(vehicle.tireGripCoeff * GRAVITY * radius);
-    
-    return maxSpeed;
-}
-
-// Calculate traction force
-double LapTimeSimulator::calculateTractionForce(double velocity, double throttle) {
-    if (velocity < 0.1) velocity = 0.1;  // Avoid division by zero
-    double engineForce = (vehicle.maxPower / velocity) * throttle;
-    double maxTractionForce = vehicle.tireGripCoeff * vehicle.mass * GRAVITY;
-    
-    return std::min(engineForce, maxTractionForce);
-}
-
-// Calculate brake force
-double LapTimeSimulator::calculateBrakeForce(double brake) {
-    return vehicle.maxBrakeTorque * brake / vehicle.wheelRadius;
-}
-
-// Simulate one time step using numerical integration
-VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment segment, double dt) {
-    VehicleState next;
-    
-    // Determine optimal throttle/brake based on segment
-    double targetSpeed = calculateMaxCornerSpeed(segment.radius);
-    
-    if (current.velocity < targetSpeed * 0.95) {
-        current.throttle = 1.0;
-        current.brake = 0.0;
-    } else if (current.velocity > targetSpeed * 1.05) {
-        current.throttle = 0.0;
-        current.brake = 0.8;
-    } else {
-        current.throttle = 0.3;
-        current.brake = 0.0;
-    }
-    
-    // Calculate forces
-    double dragForce = calculateDrag(current.velocity);
-    double tractionForce = calculateTractionForce(current.velocity, current.throttle);
-    double brakeForce = calculateBrakeForce(current.brake);
-    double gravitationalForce = vehicle.mass * GRAVITY * sin(segment.inclination * M_PI / 180.0);
-    
-    // Net force
-    double netForce = tractionForce - dragForce - brakeForce - gravitationalForce;
-    
-    // Acceleration = F/m
-    next.acceleration = netForce / vehicle.mass;
-    
-    // Numerical integration (Euler method)
-    next.velocity = current.velocity + next.acceleration * dt;
-    next.position = current.position + current.velocity * dt;
-    next.time = current.time + dt;
-    next.throttle = current.throttle;
-    next.brake = current.brake;
-    
-    // Velocity constraints
-    if (next.velocity < 0) next.velocity = 0;
-    if (next.velocity > 100) next.velocity = 100;  // ~360 km/h max
-    
-    return next;
 }
 
 // Run full lap simulation

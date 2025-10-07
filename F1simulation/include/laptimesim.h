@@ -69,7 +69,10 @@ public:
     
     // Calculate brake force
     double calculateBrakeForce(double brake);
-    
+
+    // Calculate derivartive from current state
+    double calculateDerivartives(VehicleState state, TrackSegment segment);
+ 
     // Simulate one time step using numerical integration
     VehicleState simulateStep(VehicleState current, TrackSegment segment, double dt);
 

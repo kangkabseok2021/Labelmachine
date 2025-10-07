@@ -9,7 +9,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 project ("F1Simulation")
 
 # Add source to this project's executable.
-add_executable (F1Simulation "main.cpp" "src/laptimesim.cpp")
+add_executable (F1Simulation "main.cpp" "src/laptimesim.cpp" "src/simulationstep.cpp")
 target_include_directories(F1Simulation PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
