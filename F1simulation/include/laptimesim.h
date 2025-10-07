@@ -74,11 +74,16 @@ public:
     VehicleState simulateStep(VehicleState current, TrackSegment segment, double dt);
 
     // Run full lap simulation
-    void runSimulation(double timeStep = 0.01);
+    void runSimulation(double timeStep);
     
     // Analyze telemetry data
     void analyzeTelemetry();
+    // Get lap time
 
+    double getLapTime() const;
+    
+    // Print vehicle setup
+    void printVehicleSetup();
 };
 
 #endif // LAPTIMESIM_H
