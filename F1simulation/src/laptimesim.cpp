@@ -25,11 +25,6 @@ void LapTimeSimulator::addTrackSegment(double length, double radius, double incl
     track.push_back(seg);
 }
 
-// Calculate downforce
-double LapTimeSimulator::calculateDownforce(double velocity) {
-    return 0.5 * AIR_DENSITY * vehicle.frontalArea * vehicle.downforceCoeff * velocity * velocity;
-}
-
 // Run full lap simulation
 void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
     telemetry.clear();
@@ -42,6 +37,7 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
     state.time = 0.0;
     state.throttle = 0.0;
     state.brake = 0.0;
+    state.tireTemp = 60.0;
     
     std::cout << "\n=== Starting Lap Time Simulation ===\n\n";
     
@@ -89,11 +85,13 @@ void LapTimeSimulator::analyzeTelemetry() {
     double maxSpeed = 0.0;
     double maxAccel = 0.0;
     double maxBraking = 0.0;
+    double maxTireTemp = 0.0;
     
     for (const auto& point : telemetry) {
         if (point.velocity > maxSpeed) maxSpeed = point.velocity;
         if (point.acceleration > maxAccel) maxAccel = point.acceleration;
         if (point.acceleration < maxBraking) maxBraking = point.acceleration;
+        if (point.tireTemp > maxTireTemp) maxTireTemp = point.tireTemp;
     }
     
     std::cout << "=== Telemetry Analysis ===\n";
@@ -103,6 +101,8 @@ void LapTimeSimulator::analyzeTelemetry() {
                 << maxAccel / GRAVITY << " G\n";
     std::cout << "Max Braking: " << std::setprecision(2) 
                 << std::abs(maxBraking) / GRAVITY << " G\n";
+    std::cout << "Max Tire Temperature: " << std::setprecision(1)
+                << maxTireTemp << " °C\n"; 
     std::cout << "========================\n\n";
 }
 

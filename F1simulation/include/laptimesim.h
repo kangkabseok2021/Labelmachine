@@ -10,6 +10,10 @@
 // Physical constants
 const double GRAVITY = 9.81;  // m/s²
 const double AIR_DENSITY = 1.225;  // kg/m³
+const double TIRE_MASS = 10.0;     // kg per tire
+const double TIRE_SPECIFIC_HEAT = 1000.0;  // J/(kg K)
+const double HEAT_TRANSFER_COEFF = 20.0;   // W/(m² K)
+const double AMBIENT_TEMP = 25.0;  // °C
 
 // Vehicle state structure
 struct VehicleState {
@@ -19,6 +23,7 @@ struct VehicleState {
     double time;          // s
     double throttle;      // 0-1
     double brake;         // 0-1
+    double tireTemp;      // °C
 };
 
 // Vehicle parameters
@@ -62,7 +67,7 @@ public:
     double calculateDownforce(double velocity);
 
     // Calculate maximum cornering speed
-    double calculateMaxCornerSpeed(double radius);
+    double calculateMaxCornerSpeed(double radius, double tireTemp);
 
     // Calculate traction force
     double calculateTractionForce(double velocity, double throttle);
@@ -72,7 +77,10 @@ public:
 
     // Calculate derivartive from current state
     double calculateDerivartives(VehicleState state, TrackSegment segment);
- 
+
+    // Calculate temperature derivation for current state
+    double calculateTempDerivartives(VehicleState state);
+    
     // Simulate one time step using numerical integration
     VehicleState simulateStep(VehicleState current, TrackSegment segment, double dt);
 
