@@ -36,6 +36,11 @@ struct VehicleParams {
     double maxBrakeTorque;    // Nm
     double tireGripCoeff;     // μ
     double wheelRadius;       // m
+    double weightDistFront;   // %
+    double weightDistRear;    // %
+    double centerGravity;     // m
+    double wheelBase;         // m
+    double stiffnessSus;      // rates frront/rear spring
 };
 
 // Track segment structure

@@ -11,6 +11,11 @@ LapTimeSimulator::LapTimeSimulator() {
     vehicle.maxBrakeTorque = 5000;     // Nm
     vehicle.tireGripCoeff = 1.8;
     vehicle.wheelRadius = 0.33;        // m
+    vehicle.weightDistFront = 45.0;    // %
+    vehicle.weightDistRear = 55.0;     // %
+    vehicle.centerGravity = 0.3;       // m
+    vehicle.wheelBase = 3.6;           // m
+    vehicle.stiffnessSus = 1.0;        // rates frront/rear spring
     
     totalTime = 0.0;
 }
