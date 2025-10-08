@@ -105,6 +105,20 @@ void LapTimeSimulator::calculateLoad(VehicleState& state) {
     state.rearLoad = totalLoad * vehicle.weightDistRear - loadTransfer;
 }
 
+// next tate with current state with updated acclerlation and tireTemp 
+void LapTimeSimulator::updateNextState(VehicleState& state, const VehicleState& prestate, double dt) {
+    state.velocity = prestate.velocity + state.acceleration * dt;
+    state.position = prestate.position + state.velocity * dt;
+    state.time = prestate.time + dt;
+    state.throttle = prestate.throttle;
+    state.brake = prestate.brake;
+    calculateLoad(state);
+
+    // Velocity constraints
+    if (state.velocity < 0) state.velocity = 0;
+    if (state.velocity > 100) state.velocity = 100;  // ~360 km/h max
+}
+
 // Simulate one time step using numerical integration
 VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment segment, double dt) {
     //std::cout << current.time << ":" << current.position << ":" << current.velocity << "\n";
@@ -118,35 +132,19 @@ VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment s
     double dt_t = dt/2.0;
     for(int i = 0; i < 3;++i) {
         if(i == 2) dt_t = dt;
-        state.velocity = current.velocity + acceleration[i] * dt_t;
-        state.position = current.position + state.velocity * dt_t;
-        state.time = current.time + dt_t;
+        state.acceleration = acceleration[i];
         state.tireTemp = current.tireTemp + tempDeriv[i] * dt_t;
-        state.throttle = current.throttle;
-        state.brake = current.brake;
-        calculateLoad(state);
+        updateNextState(state, current, dt_t);
         acceleration[i+1] = calculateDerivartives(state, segment);
         tempDeriv[i+1] = calculateTempDerivartives(state);
     }
     // next.acceleration = netForce / vehicle.mass;
     next.acceleration = (acceleration[0] + acceleration[3])/6.0;
     next.acceleration += (acceleration[1] + acceleration[2])/3.0;
-
-    // Numerical integration (Euler method)
-    next.velocity = current.velocity + next.acceleration * dt;
-    next.position = current.position + current.velocity * dt;
-    next.time = current.time + dt;
     // tempderivation
     next.tireTemp = current.tireTemp + (tempDeriv[0] + tempDeriv[3])/6.0;
     next.tireTemp += (tempDeriv[1] + tempDeriv[2])/3.0;
+    updateNextState(next, current, dt);
 
-    next.throttle = current.throttle;
-    next.brake = current.brake;
-    calculateLoad(next);
-
-    // Velocity constraints
-    if (next.velocity < 0) next.velocity = 0;
-    if (next.velocity > 100) next.velocity = 100;  // ~360 km/h max
-    
     return next;
 }

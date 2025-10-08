@@ -94,6 +94,9 @@ public:
     // next.frontLoad and rearLoad calculation
     void calculateLoad(VehicleState& state);
 
+    // next tate with current state with updated acclerlation and tireTemp 
+    void updateNextState(VehicleState& state, const VehicleState& prestate, double dt);
+
     // Simulate one time step using numerical integration
     VehicleState simulateStep(VehicleState current, TrackSegment segment, double dt);
 
