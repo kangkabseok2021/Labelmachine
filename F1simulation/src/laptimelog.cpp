@@ -11,7 +11,7 @@ void LapTimeSimulator::openTelemetry(const std::string& telemetryFileName) {
     else {
         telemetryLogEnabled = true;
         telemetryLogFile << "Time(s),Distance(m),Speed(m/s),Speed(km/h),Acceleration(m/s2),Throttle(%),Brake(%),TireTemp(°C)\n";
-        std::cout << "[INFO] Telemetry log file opened: " << telemetryFileName << "\n";
+        if(logEnabled) std::cout << "[INFO] Telemetry log file opened: " << telemetryFileName << "\n";
     }
 }
 
@@ -38,8 +38,24 @@ void LapTimeSimulator::exportTelemetry(const VehicleState& state) {
 // Close telemetry log file and set telemetrryLogEnabled as fasle
 void LapTimeSimulator::closeTelemetry() {
     if (telemetryLogFile.is_open()) {
-        std::cout << "\n[INFO] Closing telemetry log file.\n";
+        if(logEnabled) std::cout << "\n[INFO] Closing telemetry log file.\n";
         telemetryLogFile.close();
         telemetryLogEnabled = false;
+    }
+}
+
+// Update vehicle parameters if params is a parameter of vehicle.
+
+void LapTimeSimulator::updateVehicleParams(int params, double value) {
+    switch (params) {
+    case 4:
+        vehicle.downforceCoeff = value;
+        break;
+    case 1:
+        vehicle.mass = value;
+        break;
+    default:
+        if(logEnabled) std::cout<< params << ": No vehicle parameters. Nothing changed.\n";
+        break;
     }
 }

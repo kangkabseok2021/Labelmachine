@@ -7,7 +7,9 @@
 #include <chrono>
 #include <ctime> 
 #include <thread>
+#include <future>
 #include <vector>
+#include <utility>
 #include <cmath>
 #include <string>
 #include <iomanip>
@@ -66,11 +68,17 @@ private:
     std::vector<TrackSegment> track;
     std::vector<VehicleState> telemetry;
     double totalTime;
+    bool logEnabled = false;
     bool telemetryLogEnabled = false;
-    std::ofstream telemetryLogFile;        ///< Telemetry file stream 
+    std::ofstream telemetryLogFile;        //< Telemetry file stream 
 
 public:
     LapTimeSimulator();
+
+    /// Log message enables
+    void loggingEnable() {
+        logEnabled = true;
+    }
     
     // Add track segment
     void addTrackSegment(double length, double radius, double inclination, std::string type);
@@ -128,6 +136,9 @@ public:
 
     // Close telemetry log file and set telemetrryLogEnabled as fasle
     void closeTelemetry();
+
+    // Update vehicle parameters if params is a parameter of vehicle.
+    void updateVehicleParams(int params, double value);
 };
 
 #endif // LAPTIMESIM_H

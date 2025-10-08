@@ -15,7 +15,7 @@ LapTimeSimulator::LapTimeSimulator() {
     vehicle.weightDistRear = 0.55;     // Ratio
     vehicle.centerGravity = 0.3;       // m
     vehicle.wheelBase = 3.6;           // m
-    vehicle.stiffnessSus = 1.0;        // rates frront/rear spring
+    vehicle.stiffnessSus = 1.0;        // rates front/rear spring
 
     totalTime = 0.0;
 }
@@ -46,7 +46,7 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
     state.frontLoad = vehicle.mass * GRAVITY * (vehicle.weightDistFront / 100.0);
     state.rearLoad = vehicle.mass * GRAVITY * (vehicle.weightDistRear / 100.0);
     
-    std::cout << "\n=== Starting Lap Time Simulation ===\n\n";
+    if(logEnabled) std::cout << "\n=== Starting Lap Time Simulation ===\n\n";
     exportTelemetry(state); // Export telemetry if enabled
     
     for (size_t i = 0; i < track.size(); i++) {
@@ -54,12 +54,14 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
         double segmentStart = state.position;
         double segmentEnd = segmentStart + segment.length;
         
-        std::cout << "Segment " << (i+1) << " (" << segment.type << "): ";
-        std::cout << segment.length << "m";
-        if (segment.radius > 0) {
-            std::cout << ", R=" << segment.radius << "m";
+        if(logEnabled) { 
+            std::cout << "Segment " << (i+1) << " (" << segment.type << "): ";
+            std::cout << segment.length << "m";
         }
-        std::cout << "\n";
+        if (segment.radius > 0) {
+            if(logEnabled) std::cout << ", R=" << segment.radius << "m";
+        }
+        if(logEnabled) std::cout << "\n";
         
         // Simulate through this segment
         while (state.position < segmentEnd) {
@@ -72,17 +74,20 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
                 break;
             }
         }
-        
-        std::cout << "  Exit speed: " << std::fixed << std::setprecision(1) 
-                    << state.velocity * 3.6 << " km/h\n";
+        if(logEnabled) { 
+            std::cout << "  Exit speed: " << std::fixed << std::setprecision(1) 
+                        << state.velocity * 3.6 << " km/h\n";
+        }
     }
     
     totalTime = state.time;
     
-    std::cout << "\n=== Lap Complete ===\n";
-    std::cout << "Total Lap Time: " << std::fixed << std::setprecision(3) 
-                << totalTime << " seconds\n";
-    std::cout << "Telemetry points recorded: " << telemetry.size() << "\n\n";
+    if(logEnabled) { 
+        std::cout << "\n=== Lap Complete ===\n";
+        std::cout << "Total Lap Time: " << std::fixed << std::setprecision(3) 
+                    << totalTime << " seconds\n";
+        std::cout << "Telemetry points recorded: " << telemetry.size() << "\n\n";
+    }
 }
 
 // Analyze telemetry data
