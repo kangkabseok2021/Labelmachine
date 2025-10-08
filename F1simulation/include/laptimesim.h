@@ -18,6 +18,7 @@ const double AIR_DENSITY = 1.225;  // kg/m³
 const double TIRE_MASS = 10.0;     // kg per tire
 const double TIRE_SPECIFIC_HEAT = 1000.0;  // J/(kg K)
 const double HEAT_TRANSFER_COEFF = 20.0;   // W/(m² K)
+const double TIRE_CONTACT_AREA = 0.03; // m² per tire
 const double AMBIENT_TEMP = 25.0;  // °C
 
 // Vehicle state structure

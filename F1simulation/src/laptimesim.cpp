@@ -47,6 +47,7 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
     state.rearLoad = vehicle.mass * GRAVITY * (vehicle.weightDistRear / 100.0);
     
     std::cout << "\n=== Starting Lap Time Simulation ===\n\n";
+    exportTelemetry(state); // Export telemetry if enabled
     
     for (size_t i = 0; i < track.size(); i++) {
         TrackSegment segment = track[i];
@@ -64,7 +65,9 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
         while (state.position < segmentEnd) {
             telemetry.push_back(state);
             state = simulateStep(state, segment, timeStep);
-            
+
+            exportTelemetry(state); // Export telemetry if enabled
+
             if (state.position >= segmentEnd) {
                 break;
             }

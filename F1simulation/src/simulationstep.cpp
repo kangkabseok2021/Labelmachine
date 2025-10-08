@@ -86,13 +86,13 @@ double LapTimeSimulator::calculateDerivartives(VehicleState& state, const TrackS
 
 // Calculate temperature derivation for current state
 double LapTimeSimulator::calculateTempDerivartives(const VehicleState& state) {
-    // Heating from sliding/energy dissipation: slip_energy = 4 * velocity * tractionForce
+    // Heating from sliding/energy dissipation: slip_energy = (4) * velocity * tractionForce
     // dT/dt = k * (slip_energy)/(tire_mass * specific_heat)
     double grip_multiplier = calculateGripMultiplier(state);
     double tractionForce = calculateTractionForce(state.velocity, state.throttle, grip_multiplier);
-    double tempDerivation = (tractionForce * state.velocity * 4.0)/(TIRE_MASS * TIRE_SPECIFIC_HEAT); 
-    // Tire cooling: dT/dt = -h * (T_tire - T_ambient)
-    tempDerivation -= HEAT_TRANSFER_COEFF * (state.tireTemp - AMBIENT_TEMP)/TIRE_MASS;    
+    double tempDerivation = (tractionForce * state.velocity)/(TIRE_MASS * TIRE_SPECIFIC_HEAT); 
+    // Tire cooling: dT/dt = -h * area * (T_tire - T_ambient)
+    tempDerivation -= HEAT_TRANSFER_COEFF * (state.tireTemp - AMBIENT_TEMP)*TIRE_CONTACT_AREA;    
     return tempDerivation;
 }
 
@@ -142,8 +142,8 @@ VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment s
     next.acceleration = (acceleration[0] + acceleration[3])/6.0;
     next.acceleration += (acceleration[1] + acceleration[2])/3.0;
     // tempderivation
-    next.tireTemp = current.tireTemp + (tempDeriv[0] + tempDeriv[3])/6.0;
-    next.tireTemp += (tempDeriv[1] + tempDeriv[2])/3.0;
+    next.tireTemp = current.tireTemp + (tempDeriv[0] + tempDeriv[3]) * dt/6.0;
+    next.tireTemp += (tempDeriv[1] + tempDeriv[2]) * dt/3.0;
     updateNextState(next, current, dt);
 
     return next;

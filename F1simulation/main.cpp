@@ -21,8 +21,11 @@ int main() {
     simulator.addTrackSegment(90, 120, 0, "left");         // Fast left
     
     // Run simulation
+    simulator.openTelemetry("telemetry_log.csv"); // Open telemetry log file
+
     simulator.runSimulation(0.01);
-    
+
+    simulator.closeTelemetry(); // Close telemetry log file
     // Analyze results
     simulator.analyzeTelemetry();
     

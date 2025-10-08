@@ -32,12 +32,13 @@ void LapTimeSimulator::exportTelemetry(const VehicleState& state) {
                          << state.brake * 100.0 << ","
                          << state.tireTemp << "\n";
         telemetryLogFile.flush();
+    }
 }
 
 // Close telemetry log file and set telemetrryLogEnabled as fasle
 void LapTimeSimulator::closeTelemetry() {
     if (telemetryLogFile.is_open()) {
-        std::cout << "\n[INFO] Closing telemetry log (" << TELEMETRY_LOG_FILE_NAME << ")\n";
+        std::cout << "\n[INFO] Closing telemetry log file.\n";
         telemetryLogFile.close();
         telemetryLogEnabled = false;
     }
