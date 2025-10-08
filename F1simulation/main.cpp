@@ -39,12 +39,12 @@ double runSimulator(bool islogging, double downforceCoeff) {
 int openmp_run(std::vector<double>& inputs) {
     // Run multiple simulations in parallel with different downforceCoeff
     std::cout << "\n=== Running Parallel Simulations with Varying Downforce Coeff with OpenMP\n";
-    std::vector<std::vector<double>> cresults;
+    std::vector<std::vector<double>> cresults(inputs.size());
 
     #pragma omp parallel for
-    for(double coeff:inputs) {
-        double result = runSimulator(false, coeff);
-        cresults.push_back({coeff, result});
+    for(int i = 0;i<inputs.size();i++) {
+        double result = runSimulator(false, inputs[i]);
+        cresults[i] = {inputs[i], result};
     }
     
     std::cout << "All threads have finished and results:\n";
