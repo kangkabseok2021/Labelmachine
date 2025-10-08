@@ -2,6 +2,11 @@
 #define LAPTIMESIM_H
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <chrono>
+#include <ctime> 
+#include <thread>
 #include <vector>
 #include <cmath>
 #include <string>
@@ -60,7 +65,9 @@ private:
     std::vector<TrackSegment> track;
     std::vector<VehicleState> telemetry;
     double totalTime;
-    
+    bool telemetryLogEnabled = false;
+    std::ofstream telemetryLogFile;        ///< Telemetry file stream 
+
 public:
     LapTimeSimulator();
     
@@ -111,6 +118,15 @@ public:
     
     // Print vehicle setup
     void printVehicleSetup();
+
+    // Open telemetry log file and set telemetrryLogEnabled
+    void openTelemetry(const std::string& telemetryFileName);
+
+    // Export current telemetry to telemetry log file
+    void exportTelemetry(const VehicleState& state);
+
+    // Close telemetry log file and set telemetrryLogEnabled as fasle
+    void closeTelemetry();
 };
 
 #endif // LAPTIMESIM_H
