@@ -24,6 +24,8 @@ struct VehicleState {
     double throttle;      // 0-1
     double brake;         // 0-1
     double tireTemp;      // °C
+    double frontLoad;     // kg
+    double rearLoad;      // kg
 };
 
 // Vehicle parameters
@@ -36,8 +38,8 @@ struct VehicleParams {
     double maxBrakeTorque;    // Nm
     double tireGripCoeff;     // μ
     double wheelRadius;       // m
-    double weightDistFront;   // %
-    double weightDistRear;    // %
+    double weightDistFront;   // Ratio
+    double weightDistRear;    // Ratio
     double centerGravity;     // m
     double wheelBase;         // m
     double stiffnessSus;      // rates frront/rear spring
@@ -72,20 +74,26 @@ public:
     double calculateDownforce(double velocity);
 
     // Calculate maximum cornering speed
-    double calculateMaxCornerSpeed(double radius, double tireTemp);
+    double calculateMaxCornerSpeed(double radius, double grip_multiplier);
 
     // Calculate traction force
-    double calculateTractionForce(double velocity, double throttle);
-    
+    double calculateTractionForce(double velocity, double throttle, double grip_multiplier);
+
+    // Calculate grip_multiplier from VehicleState
+    double calculateGripMultiplier(const VehicleState& state);
+
     // Calculate brake force
     double calculateBrakeForce(double brake);
 
     // Calculate derivartive from current state
-    double calculateDerivartives(VehicleState state, TrackSegment segment);
+    double calculateDerivartives(VehicleState& state, const TrackSegment& segment);
 
     // Calculate temperature derivation for current state
-    double calculateTempDerivartives(VehicleState state);
-    
+    double calculateTempDerivartives(const VehicleState& state);
+
+    // next.frontLoad and rearLoad calculation
+    void calculateLoad(VehicleState& state);
+
     // Simulate one time step using numerical integration
     VehicleState simulateStep(VehicleState current, TrackSegment segment, double dt);
 

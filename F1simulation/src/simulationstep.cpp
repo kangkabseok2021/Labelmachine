@@ -10,31 +10,41 @@ double LapTimeSimulator::calculateDownforce(double velocity) {
     return 0.5 * AIR_DENSITY * vehicle.frontalArea * vehicle.downforceCoeff * velocity * velocity;
 }
 
-
 // Calculate maximum cornering speed
-double LapTimeSimulator::calculateMaxCornerSpeed(double radius, double tireTemp) {
+double LapTimeSimulator::calculateMaxCornerSpeed(double radius, double grip_multiplier) {
     if (radius == 0) return 1000.0;  // Straight (no limit from cornering)
-    
-    double grip_multiplier = 1.0;
-    if(tireTemp < 80.0) grip_multiplier = 0.7 + 0.3 *(tireTemp/80.0);
-    else if(tireTemp > 120.0) grip_multiplier = 1.0 - 0.5 * ((tireTemp - 120.0)/80.0);
+    double tireGrip = vehicle.tireGripCoeff * grip_multiplier;
     // Simplified: v_max = sqrt(μ * g * r)
     // In reality, includes downforce effects
     double downforceAtSpeed = 1000.0;  // Simplified assumption
     double normalForce = vehicle.mass * GRAVITY + downforceAtSpeed;
-    double maxSpeed = sqrt(vehicle.tireGripCoeff * grip_multiplier * GRAVITY * radius);
+    double maxSpeed = sqrt(tireGrip * GRAVITY * radius);
     
     return maxSpeed;
 }
 
 // Calculate traction force
-double LapTimeSimulator::calculateTractionForce(double velocity, double throttle) {
+double LapTimeSimulator::calculateTractionForce(double velocity, double throttle, double grip_multiplier) {
     if (velocity < 0.1) velocity = 0.1;  // Avoid division by zero
     double engineForce = (vehicle.maxPower / velocity) * throttle;
-    double maxTractionForce = vehicle.tireGripCoeff * vehicle.mass * GRAVITY;
+    double maxTractionForce = vehicle.tireGripCoeff * grip_multiplier * vehicle.mass * GRAVITY;
     
     return std::min(engineForce, maxTractionForce);
 }
+
+// Calculate grip_multiplier from VehicleState
+double LapTimeSimulator::calculateGripMultiplier(const VehicleState& state) {
+    double static_load = vehicle.mass * GRAVITY;
+    // double grip_multiplier = std::sqrt(state.frontLoad/(static_load * vehicle.weightDistFront));
+    // grip_multiplier = std::min(grip_multiplier, std::sqrt(state.rearLoad/(static_load * vehicle.weightDistRear)));    
+
+    double grip_multiplier = std::sqrt((state.frontLoad + state.rearLoad)/static_load);
+    //grip_multiplier = 1.0;
+    if(state.tireTemp < 80.0) grip_multiplier *= 0.7 + 0.3 *(state.tireTemp/80.0);
+    else if(state.tireTemp > 120.0) grip_multiplier *= 1.0 - 0.5 * ((state.tireTemp - 120.0)/80.0);
+    return grip_multiplier;
+}
+
 
 // Calculate brake force
 double LapTimeSimulator::calculateBrakeForce(double brake) {
@@ -42,10 +52,11 @@ double LapTimeSimulator::calculateBrakeForce(double brake) {
 }
 
 // Simulate one time step using numerical integration
-double LapTimeSimulator::calculateDerivartives(VehicleState state, TrackSegment segment) {
+double LapTimeSimulator::calculateDerivartives(VehicleState& state, const TrackSegment& segment) {
     
     // Determine optimal throttle/brake based on segment
-    double targetSpeed = calculateMaxCornerSpeed(segment.radius, state.tireTemp);
+    double grip_multiplier = calculateGripMultiplier(state);
+    double targetSpeed = calculateMaxCornerSpeed(segment.radius, grip_multiplier);
     
     if (state.velocity < targetSpeed * 0.95) {
         state.throttle = 1.0;
@@ -60,7 +71,7 @@ double LapTimeSimulator::calculateDerivartives(VehicleState state, TrackSegment 
     
     // Calculate forces
     double dragForce = calculateDrag(state.velocity);
-    double tractionForce = calculateTractionForce(state.velocity, state.throttle);
+    double tractionForce = calculateTractionForce(state.velocity, state.throttle, grip_multiplier);
     double brakeForce = calculateBrakeForce(state.brake);
     double gravitationalForce = vehicle.mass * GRAVITY * sin(segment.inclination * M_PI / 180.0);
     
@@ -74,18 +85,30 @@ double LapTimeSimulator::calculateDerivartives(VehicleState state, TrackSegment 
 }
 
 // Calculate temperature derivation for current state
-double LapTimeSimulator::calculateTempDerivartives(VehicleState state) {
+double LapTimeSimulator::calculateTempDerivartives(const VehicleState& state) {
     // Heating from sliding/energy dissipation: slip_energy = 4 * velocity * tractionForce
     // dT/dt = k * (slip_energy)/(tire_mass * specific_heat)
-    double tractionForce = calculateTractionForce(state.velocity, state.throttle);
+    double grip_multiplier = calculateGripMultiplier(state);
+    double tractionForce = calculateTractionForce(state.velocity, state.throttle, grip_multiplier);
     double tempDerivation = (tractionForce * state.velocity * 4.0)/(TIRE_MASS * TIRE_SPECIFIC_HEAT); 
     // Tire cooling: dT/dt = -h * (T_tire - T_ambient)
     tempDerivation -= HEAT_TRANSFER_COEFF * (state.tireTemp - AMBIENT_TEMP)/TIRE_MASS;    
     return tempDerivation;
 }
 
+// next.frontLoad and rearLoad calculation
+void LapTimeSimulator::calculateLoad(VehicleState& state) {
+    double downforce = calculateDownforce(state.velocity);
+    double totalLoad = vehicle.mass * GRAVITY + downforce;
+    double loadTransfer = (state.acceleration * vehicle.mass * vehicle.centerGravity) / vehicle.wheelBase;
+    state.frontLoad = totalLoad * vehicle.weightDistFront + loadTransfer;
+    state.rearLoad = totalLoad * vehicle.weightDistRear - loadTransfer;
+}
+
 // Simulate one time step using numerical integration
 VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment segment, double dt) {
+    //std::cout << current.time << ":" << current.position << ":" << current.velocity << "\n";
+
     VehicleState next;    
 
     VehicleState state;
@@ -101,6 +124,7 @@ VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment s
         state.tireTemp = current.tireTemp + tempDeriv[i] * dt_t;
         state.throttle = current.throttle;
         state.brake = current.brake;
+        calculateLoad(state);
         acceleration[i+1] = calculateDerivartives(state, segment);
         tempDeriv[i+1] = calculateTempDerivartives(state);
     }
@@ -118,7 +142,8 @@ VehicleState LapTimeSimulator::simulateStep(VehicleState current, TrackSegment s
 
     next.throttle = current.throttle;
     next.brake = current.brake;
-    
+    calculateLoad(next);
+
     // Velocity constraints
     if (next.velocity < 0) next.velocity = 0;
     if (next.velocity > 100) next.velocity = 100;  // ~360 km/h max

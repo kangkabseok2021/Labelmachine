@@ -11,12 +11,12 @@ LapTimeSimulator::LapTimeSimulator() {
     vehicle.maxBrakeTorque = 5000;     // Nm
     vehicle.tireGripCoeff = 1.8;
     vehicle.wheelRadius = 0.33;        // m
-    vehicle.weightDistFront = 45.0;    // %
-    vehicle.weightDistRear = 55.0;     // %
+    vehicle.weightDistFront = 0.45;    // Ratio
+    vehicle.weightDistRear = 0.55;     // Ratio
     vehicle.centerGravity = 0.3;       // m
     vehicle.wheelBase = 3.6;           // m
     vehicle.stiffnessSus = 1.0;        // rates frront/rear spring
-    
+
     totalTime = 0.0;
 }
 
@@ -43,6 +43,8 @@ void LapTimeSimulator::runSimulation(double timeStep = 0.01) {
     state.throttle = 0.0;
     state.brake = 0.0;
     state.tireTemp = 60.0;
+    state.frontLoad = vehicle.mass * GRAVITY * (vehicle.weightDistFront / 100.0);
+    state.rearLoad = vehicle.mass * GRAVITY * (vehicle.weightDistRear / 100.0);
     
     std::cout << "\n=== Starting Lap Time Simulation ===\n\n";
     
@@ -91,12 +93,16 @@ void LapTimeSimulator::analyzeTelemetry() {
     double maxAccel = 0.0;
     double maxBraking = 0.0;
     double maxTireTemp = 0.0;
+    double maxFrontLoad = 0.0;
+    double maxRearLoad = 0.0;
     
     for (const auto& point : telemetry) {
         if (point.velocity > maxSpeed) maxSpeed = point.velocity;
         if (point.acceleration > maxAccel) maxAccel = point.acceleration;
         if (point.acceleration < maxBraking) maxBraking = point.acceleration;
         if (point.tireTemp > maxTireTemp) maxTireTemp = point.tireTemp;
+        if (point.frontLoad > maxFrontLoad) maxFrontLoad = point.frontLoad;
+        if (point.rearLoad  > maxRearLoad) maxRearLoad = point.rearLoad;
     }
     
     std::cout << "=== Telemetry Analysis ===\n";
@@ -108,6 +114,10 @@ void LapTimeSimulator::analyzeTelemetry() {
                 << std::abs(maxBraking) / GRAVITY << " G\n";
     std::cout << "Max Tire Temperature: " << std::setprecision(1)
                 << maxTireTemp << " °C\n"; 
+    std::cout << "Max Front Load: " << std::setprecision(1)
+                << maxFrontLoad << " kg\n"; 
+    std::cout << "Max Rear Load: " << std::setprecision(1)
+                << maxRearLoad << " kg\n"; 
     std::cout << "========================\n\n";
 }
 
